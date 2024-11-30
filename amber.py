@@ -5,10 +5,10 @@ import os
 app = Flask(__name__)
 
 # Twilio configuration
-TWILIO_ACCOUNT_SID = "ACbeeb50d1489a76611aabe973f8c84689"  # Replace with your Twilio Account SID
-TWILIO_AUTH_TOKEN = "7f9485d34b030053d190b19e4597d4ec"    # Replace with your Twilio Auth Token
-TWILIO_PHONE_NUMBER = "+17756373600"      # Replace with your Twilio phone number
-AUTHORITY_PHONE_NUMBER = "+916392104804"   # Replace with the authority's phone number
+TWILIO_ACCOUNT_SID = "USE YOUR TWILIO SID"  # Replace with your Twilio Account SID
+TWILIO_AUTH_TOKEN = "GET FROM TWILIO DEV"    # Replace with your Twilio Auth Token
+TWILIO_PHONE_NUMBER = "GET FROM TWILIO DEV"      # Replace with your Twilio phone number
+AUTHORITY_PHONE_NUMBER = "USE NUMBER ON TWILIO ACCOUNT FOR TRIAL OR ON PREMIUM USE ANY"   # Replace with the authority's phone number
 
 # Initialize Twilio Client
 client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
