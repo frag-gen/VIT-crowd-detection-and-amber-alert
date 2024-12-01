@@ -1,0 +1,88 @@
+import threading
+import cv2
+import numpy as np
+import os
+import requests
+from flask import Flask, request, jsonify, Response
+
+# Initialize Flask app
+app = Flask(__name__)
+
+# Thread-safe last_alert_time dictionary
+last_alert_time = {}
+alert_time_lock = threading.Lock()
+
+# Load campus map
+file_path = r"C:\Users\aksha\OneDrive\Desktop\VIT-MAP.png"
+if not os.path.exists(file_path):
+    print(f"File not found: {file_path}")
+    exit()
+
+map_image = cv2.imread(file_path)
+if map_image is None:
+    print("Error: Unable to load the map image. Check the file path and format.")
+    exit()
+
+# YOLO model (add your model files)
+weights_path = r"C:\Users\aksha\Downloads\yolov4.weights"
+config_path = r"C:\Users\aksha\Downloads\yolov4.cfg"
+coco_names_path = r"C:\Users\aksha\Downloads\coco.names"
+net = cv2.dnn.readNet(weights_path, config_path)
+
+# Video capture function
+def capture_frames():
+    global frame
+    camera = cv2.VideoCapture(0, cv2.CAP_DSHOW)  # Use DirectShow for webcam compatibility
+    while True:
+        ret, new_frame = camera.read()
+        if not ret:
+            print("Error: Failed to capture frame")
+            break
+        frame = new_frame
+
+# Start video capture in a separate thread
+capture_thread = threading.Thread(target=capture_frames)
+capture_thread.daemon = True
+capture_thread.start()
+
+# Generate frames for streaming
+def gen_frames():
+    while True:
+        if frame is not None:
+            ret, buffer = cv2.imencode('.jpg', frame)
+            frame = buffer.tobytes()
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+
+# Video feed route
+@app.route('/video_feed')
+def video_feed():
+    return Response(gen_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+# Dummy function for updating the heatmap
+@app.route('/update_heatmap', methods=['POST'])
+def update_heatmap():
+    data = request.get_json()
+    people_count = data.get('peopleCount', 0)
+    status = data.get('status', 'normal')
+
+    # Generate a simple heatmap (For demonstration purposes, use color overlays)
+    heatmap = np.zeros((480, 640, 3), dtype=np.uint8)
+
+    if status == 'high':
+        heatmap[:] = (0, 0, 255)  # Red for high density
+    else:
+        heatmap[:] = (0, 255, 0)  # Green for normal density
+
+    # Save the generated heatmap
+    cv2.imwrite('static/heatmap/heatmap.png', heatmap)
+
+    return jsonify({"message": "Heatmap updated successfully!"}), 200
+
+# Index route (serves your frontend HTML)
+@app.route('/')
+def index():
+    return app.send_static_file('index.html')
+
+if __name__ == "__main__":
+    app.run(debug=True, host='0.0.0.0', port=5000)
