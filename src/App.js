@@ -10,17 +10,17 @@ const CrowdDetectionApp = () => {
   const [peopleCount, setPeopleCount] = useState(0);
   const [status, setStatus] = useState('normal');
   const [historicalData, setHistoricalData] = useState([]);
+  const [error, setError] = useState(null);
 
   // Camera detection states
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   // Function to send an alert to the backend
   const sendAlertToBackend = async () => {
     try {
-      const response = await fetch('http://localhost:5000/send_alert', {
+      const response = await fetch('http://localhost:5000/send_alert', {  // Update the URL based on your backend
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -56,7 +56,7 @@ const CrowdDetectionApp = () => {
     // Update historical data
     const newDataPoint = {
       time: new Date().toLocaleTimeString(),
-      count: peopleCount
+      count: peopleCount,
     };
     setHistoricalData(prev => [...prev.slice(-19), newDataPoint]);
 
