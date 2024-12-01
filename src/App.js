@@ -20,7 +20,7 @@ const CrowdDetectionApp = () => {
   // Function to send an alert to the backend
   const sendAlertToBackend = async () => {
     try {
-      const response = await fetch('http://localhost:5000/send_alert', {  // Update the URL based on your backend
+      const response = await fetch('http://localhost:3001/send_alert', {  // Update the URL based on your backend
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
